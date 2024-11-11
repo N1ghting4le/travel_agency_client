@@ -37,6 +37,7 @@ const SignInForm = () => {
 
                 user.admin ? setAdmin(true) : setUser(user);
                 setToken(token);
+                localStorage.setItem("token", token);
                 router.back();
                 reset();
             })

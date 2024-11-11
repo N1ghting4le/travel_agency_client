@@ -73,6 +73,16 @@ const AccountMenu = ({ user, isAdmin }) => {
         document.scrollingElement.style.overflow = "auto";
     }
 
+    const handleLogout = () => {
+        if ((user && pathanme.includes("users")) || (isAdmin && pathanme.includes("admin"))) {
+            router.back();
+        }
+
+        localStorage.removeItem("token");
+        handleClose();
+        logout();
+    }
+
     if (isAdmin) return (
         <>
         <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
@@ -105,7 +115,7 @@ const AccountMenu = ({ user, isAdmin }) => {
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleClose} sx={linkListItemStyle}>
-                <Link href="/add-hotel" className={styles.link}>
+                <Link href="/admin/add-hotel" className={styles.link}>
                     <ListItemIcon>
                         <ApartmentIcon fontSize="small" />
                     </ListItemIcon>
@@ -113,17 +123,14 @@ const AccountMenu = ({ user, isAdmin }) => {
                 </Link>
             </MenuItem>
             <MenuItem onClick={handleClose} sx={linkListItemStyle}>
-                <Link href="/add-tour" className={styles.link}>
+                <Link href="/admin/add-tour" className={styles.link}>
                     <ListItemIcon>
                         <Luggage fontSize="small" />
                     </ListItemIcon>
                     Добавить тур
                 </Link>
             </MenuItem>
-            <MenuItem onClick={() => {
-                handleClose();
-                logout();
-            }} sx={{fontFamily: "inherit"}}>
+            <MenuItem onClick={handleLogout} sx={{fontFamily: "inherit"}}>
                 <ListItemIcon>
                     <Logout fontSize="small" />
                 </ListItemIcon>
@@ -174,11 +181,7 @@ const AccountMenu = ({ user, isAdmin }) => {
                     Мой кабинет
                 </Link>
             </MenuItem>
-            <MenuItem onClick={() => {
-                handleClose();
-                if (pathanme.includes("users")) router.back();
-                logout();
-            }} sx={{fontFamily: "inherit"}}>
+            <MenuItem onClick={handleLogout} sx={{fontFamily: "inherit"}}>
                 <ListItemIcon>
                     <Logout fontSize="small" />
                 </ListItemIcon>

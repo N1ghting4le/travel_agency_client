@@ -1,15 +1,29 @@
 'use client';
 
 import styles from "./header.module.css";
+import { BASE_URL } from "@/env";
 import Link from "next/link";
 import Logo from "../logo/Logo";
 import AccountMenu from "../accountMenu/AccountMenu";
 import HeaderMenu from "./menu/Menu";
+import { useEffect } from "react";
 import { useUser, useAdmin } from "../GlobalContext";
+import useQuery from "@/hooks/query.hook";
 
 const Header = () => {
-    const { user } = useUser();
-    const { isAdmin } = useAdmin();
+    const { user, setUser } = useUser();
+    const { isAdmin, setAdmin } = useAdmin();
+    const { query } = useQuery();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+
+        if (!token) return;
+
+        query(`${BASE_URL}/auth/`, "GET", {'authorization': `Bearer ${token}`})
+            .then(res => res.admin ? setAdmin(true) : setUser(res))
+            .catch(() => localStorage.removeItem("token"));
+    }, []);
 
     return (
         <header className={styles.header}>

@@ -9,7 +9,7 @@ import LocationCityIcon from '@mui/icons-material/LocationCity';
 import LanguageIcon from '@mui/icons-material/Language';
 import SurfingIcon from '@mui/icons-material/Surfing';
 import PinDropIcon from '@mui/icons-material/PinDrop';
-import { getData } from "@/app/(adminForms)/edit-tour/[id]/page";
+import { getData } from "@/app/admin/edit-tour/[id]/page";
 
 const TourPage = async ({ params }) => {
     const tour = await getData(`${BASE_URL}/tour/get/${params.id}`);

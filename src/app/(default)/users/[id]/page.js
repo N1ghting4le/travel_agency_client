@@ -2,7 +2,7 @@ import styles from "./page.module.css";
 import { BASE_URL } from "@/env";
 import UserInfo from "@/components/userInfo/UserInfo";
 import BookingsList from "@/components/bookingsList/BookingsList";
-import { getData } from "@/app/(adminForms)/edit-tour/[id]/page";
+import { getData } from "@/app/admin/edit-tour/[id]/page";
 
 export const metadata = {
     title: "Личный кабинет"

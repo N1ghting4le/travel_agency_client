@@ -10,8 +10,8 @@ const useQuery = () => {
             setQueryState('pending');
 
             try {
-                const res = await fetch(url, { method, headers, body });
-                const data = await res.json();
+                const res = await fetch(url, { method, headers, body }),
+                data = await (res.headers.get('Content-type').includes("json") ? res.json() : res.text());
 
                 if (!res.ok) {
                     throw new Error(data);
