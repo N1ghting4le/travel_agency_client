@@ -7,12 +7,13 @@ import Logo from "../logo/Logo";
 import AccountMenu from "../accountMenu/AccountMenu";
 import HeaderMenu from "./menu/Menu";
 import { useEffect } from "react";
-import { useUser, useAdmin } from "../GlobalContext";
+import { useUser, useAdmin, useToken } from "../GlobalContext";
 import useQuery from "@/hooks/query.hook";
 
 const Header = () => {
     const { user, setUser } = useUser();
     const { isAdmin, setAdmin } = useAdmin();
+    const { setToken } = useToken();
     const { query } = useQuery();
 
     useEffect(() => {
@@ -21,7 +22,10 @@ const Header = () => {
         if (!token) return;
 
         query(`${BASE_URL}/auth/`, "GET", {'authorization': `Bearer ${token}`})
-            .then(res => res.admin ? setAdmin(true) : setUser(res))
+            .then(res => {
+                res.admin ? setAdmin(true) : setUser(res);
+                setToken(token);
+            })
             .catch(() => localStorage.removeItem("token"));
     }, []);
 

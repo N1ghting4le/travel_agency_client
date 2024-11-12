@@ -13,7 +13,7 @@ import { Checkbox, FormControlLabel, FormHelperText } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAdmin } from "../GlobalContext";
+import { useAdmin, useToken } from "../GlobalContext";
 import useQuery from "@/hooks/query.hook";
 import schema from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -25,6 +25,7 @@ import countries from "@/lists/countries";
 
 const HotelForm = () => {
     const { isAdmin } = useAdmin();
+    const { token } = useToken();
     const router = useRouter();
     const [stars, setStars] = useState(1);
 
@@ -59,7 +60,7 @@ const HotelForm = () => {
 
         photos.forEach(photo => formData.append("photos", photo));
 
-        query(`${BASE_URL}/hotel/add`, "POST", {}, formData)
+        query(`${BASE_URL}/hotel/add`, "POST", {'authorization': `Bearer ${token}`}, formData)
             .then(() => reset())
             .finally(() => setTimeout(resetQueryState, 2000));
     }

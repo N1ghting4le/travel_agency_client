@@ -24,6 +24,8 @@
     font-size: 18px;
     font-family: var(--font-icon);
     width: 200px;
+    border: none;
+    background: transparent;
 }
 
 .removeIcon::before {

@@ -32,11 +32,13 @@ const Photos = ({ control, trigger, error }) => {
                 return;
             }
 
-            addedPhotos.push(URL.createObjectURL(file));
+            const photo = URL.createObjectURL(file);
+
+            addedPhotos.push(photo);
+            append(file);
         });
 
         setPreviews(previews => [...previews, ...addedPhotos]);
-        append(addedPhotos);
         trigger("photos");
         e.target.value = "";
     }
@@ -58,7 +60,7 @@ const Photos = ({ control, trigger, error }) => {
                             render={() => (
                                 <>
                                 <Image src={previews[i]} alt={i + 1} width={200} height={200} className={styles.image}/>
-                                <Button onClick={() => removePhoto(i)} className={styles.removeIcon}/>
+                                <button onClick={() => removePhoto(i)} className={styles.removeIcon}/>
                                 </>
                             )}
                         />

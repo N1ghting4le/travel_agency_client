@@ -81,6 +81,11 @@ const TourPage = async ({ params }) => {
             </div>
             <Divider/>
             <p>{hotel_descr}</p>
+            {hotel_notes &&
+            <div className={styles.notes}>
+                <p className={styles.bold}>Примечания:</p>
+                <p className={styles.tourDescr}>{hotel_notes}</p>
+            </div>}
             <TourReviews id={id}/>
         </main>
     );
