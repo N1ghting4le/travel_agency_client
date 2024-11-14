@@ -6,9 +6,11 @@
 }
 
 .bookingItem {
-    display: flex;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-auto-flow: column;
     justify-content: space-between;
-    align-items: center;
+    row-gap: 32px;
     padding: 32px 24px;
     width: 100%;
     background: #fff;
@@ -25,6 +27,7 @@
 .infoItem {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 8px;
     color: #112211;
 }
@@ -39,7 +42,7 @@
     font-weight: 600;
 }
 
-.pohui {
+.infoItemWrapper {
     display: flex;
     flex-direction: column;
     gap: 32px;
@@ -65,13 +68,14 @@
 
 @media (max-width: 593px) {
     .bookingItem {
+        display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: flex-start;
         gap: 20px;
     }
 
-    .pohui {
+    .infoItemWrapper {
         gap: 20px;
     }
 }

@@ -37,7 +37,7 @@ const BookingsList = ({ bookings }) => {
                         <p className={styles.info}>{endDateStr}</p>
                     </div>
                 </div>
-                <div className={styles.pohui}>
+                <div className={styles.infoItemWrapper}>
                     <div className={styles.infoItem}>
                         <p className={styles.title}>Тур</p>
                         <p className={styles.info}>{tour_title}</p>
@@ -47,7 +47,7 @@ const BookingsList = ({ bookings }) => {
                         <p className={styles.info}>{hotel_title}</p>
                     </div>
                 </div>
-                <div className={styles.pohui}>
+                <div className={styles.infoItemWrapper}>
                     <div className={styles.infoItem}>
                         <p className={styles.title}>Тип номера</p>
                         <p className={styles.info}>{room_type}</p>
@@ -57,7 +57,7 @@ const BookingsList = ({ bookings }) => {
                         <p className={styles.info}>{nutrition_type}</p>
                     </div>
                 </div>
-                <div className={styles.pohui}>
+                <div className={styles.infoItemWrapper}>
                     <div className={styles.infoItem}>
                         <p className={styles.title}>Кол-во взрослых</p>
                         <p className={styles.info}>{adults_amount}</p>
@@ -71,9 +71,11 @@ const BookingsList = ({ bookings }) => {
                     <p className={styles.title}>Цена</p>
                     <p className={styles.price}>${total_price}</p>
                 </div>
-                <Link href={`/tours/${tour_id}`}>
-                    <button className={styles.btn}>Посмотреть тур</button>
-                </Link>
+                <div>
+                    <Link href={`/tours/${tour_id}`}>
+                        <button className={styles.btn}>Посмотреть тур</button>
+                    </Link>
+                </div>
             </li>
         );
     });
