@@ -10,7 +10,7 @@ const schema = object().shape({
     country: string().required("Вы не выбрали страну"),
     nutritionTypes: array().compact().min(1, "Должен быть выбран хотя бы один тип питания"),
     roomTypes: array().compact().min(1, "Должен быть выбран хотя бы один тип номеров"),
-    photos: array().min(1, "Вы не загрузили ни одной фотографии")
+    photos: array().min(5, "Должно быть загружено не менее 5 фотографий")
 });
 
 export default schema;
