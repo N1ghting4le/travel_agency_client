@@ -28,7 +28,7 @@ const TourForm = ResetHoc(({ tour, reset }) => {
     const router = useRouter();
     const [hotels, setHotels] = useState(tour ? [{hotel_title: tour.hotel_title, id: tour.hotel_id}] : []);
 
-    const { control, handleSubmit, formState: { errors }, resetField } = useForm({
+    const { control, handleSubmit, formState: { errors, isDirty, defaultValues }, setValue, getValues, reset: formReset } = useForm({
         resolver: yupResolver(schema),
         mode: "onChange",
         defaultValues: {
@@ -60,13 +60,21 @@ const TourForm = ResetHoc(({ tour, reset }) => {
         }, headers = {'Content-type': 'application/json', 'authorization': `Bearer ${token}`};
 
         q2(`${BASE_URL}/tour/${tour ? `edit/${id}` : "add"}`, tour ? "PATCH" : "POST", headers, JSON.stringify(body))
-            .then(res => tour ? changeTour(res) : setTimeout(reset, 2000))
+            .then(res => {
+                if (tour) {
+                    changeTour(res);
+                    formReset(data);
+                } else setTimeout(reset, 2000);
+            })
             .finally(() => setTimeout(resetQueryState, 2000));
     }
 
     const onCountryChange = (e) => {
-        resetField("hotelTitle");
-        resetField("basePrice");
+        const isSameCountry = e.target.value === defaultValues.destinationCountry;
+        const options = { shouldDirty: true, shouldValidate: isSameCountry };
+
+        setValue("hotelTitle", isSameCountry ? defaultValues.hotelTitle : "", options);
+        setValue("basePrice", isSameCountry ? defaultValues.basePrice : "", options);
 
         q1(`${BASE_URL}/hotel/getHotels/${e.target.value}`)
             .then(res => setHotels(res))
@@ -121,10 +129,10 @@ const TourForm = ResetHoc(({ tour, reset }) => {
                                     error>Не удалось загрузить отели</FormHelperText>;
                 }
             })()}
-            {hotels.length ?
+            {hotels.length && qs1 !== "pending" && qs1 !== "error" ?
             <>
             <SelectMenu
-                defaultValue={tour?.hotel_title}
+                defaultValue={getValues("destinationCountry") === defaultValues.destinationCountry ? defaultValues.hotelTitle : ""}
                 values={hotels.map(hotel => hotel.hotel_title)}
                 name="hotelTitle"
                 control={control}
@@ -135,7 +143,7 @@ const TourForm = ResetHoc(({ tour, reset }) => {
                 render={
                     ({ field: { onChange } }) =>
                         <Input
-                            defaultValue={tour?.base_price}
+                            defaultValue={getValues("destinationCountry") === defaultValues.destinationCountry ? defaultValues.basePrice : ""}
                             placeholder="Начальная цена"
                             error={errors.basePrice}
                             onChange={onChange}
@@ -145,7 +153,7 @@ const TourForm = ResetHoc(({ tour, reset }) => {
             <div className={styles.submitWrapper}>
                 {qs2 === "pending" ? <AdminSpinner/> :
                 <SubmitBtn
-                    disabled={qs2 !== "idle"}
+                    disabled={qs2 !== "idle" || (tour && !isDirty)}
                     style={{width: "100%"}}>{tour ? "Сохранить изменения" : "Добавить"}</SubmitBtn>}
                 {qs2 === "error" &&
                 <FormHelperText sx={helperStyle} error>Произошла ошибка</FormHelperText>}

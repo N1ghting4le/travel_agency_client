@@ -14,8 +14,12 @@ import { FormHelperText } from "@mui/material";
 import UserSpinner from "../loadingSpinners/UserSpinner";
 
 const ReviewForm = ({ setReviews, review, tourId }) => {
-    const [mark, setMark] = useState(review?.mark || 1);
-    const [text, setText] = useState(review?.review_text);
+    const [currReview, setCurrReview] = useState({
+        text: review?.review_text || "",
+        mark: review?.mark || 1
+    });
+    const [mark, setMark] = useState(currReview.mark);
+    const [text, setText] = useState(currReview.text);
     const [initial, setInitial] = useState(true);
     const { user } = useUser();
     const { token } = useToken();
@@ -26,7 +30,10 @@ const ReviewForm = ({ setReviews, review, tourId }) => {
     const onSubmit = (e) => {
         e.preventDefault();
         setInitial(false);
-        if (!text) return;
+
+        const trimmedText = text.trim();
+
+        if (!trimmedText) return;
 
         const body = {
             id: review?.id || uuid(),
@@ -35,7 +42,7 @@ const ReviewForm = ({ setReviews, review, tourId }) => {
             tour_id: tourId,
             review_date: new Date(),
             mark,
-            review_text: text
+            review_text: trimmedText
         };
         const { review_user_id, ...rest } = body;
         
@@ -43,11 +50,14 @@ const ReviewForm = ({ setReviews, review, tourId }) => {
             'Content-type': 'application/json',
             'authorization': `Bearer ${token}`
         }, JSON.stringify(body))
-            .then(() => review ?
-                setReviews(reviews => reviews.map(item => item.id === review.id ? ({
-                    ...item, mark: (user ? body : item).mark, review_text: body.review_text
-                }) : item)) :
-                setReviews(reviews => [...reviews, { ...rest, name: user.name, surname: user.surname }]))
+            .then(() => {
+                if (review) {
+                    setReviews(reviews => reviews.map(item => item.id === review.id ? ({
+                        ...item, mark: body.mark, review_text: body.review_text
+                    }) : item));
+                    setCurrReview({ text: trimmedText, mark: body.mark });
+                } else setReviews(reviews => [...reviews, { ...rest, name: user.name, surname: user.surname }]);
+            })
             .finally(() => setTimeout(resetQueryState, 2000));
     }
 
@@ -63,12 +73,13 @@ const ReviewForm = ({ setReviews, review, tourId }) => {
                 multiline
                 value={text}
                 onChange={onChange}
-                error={initial || text ? null : { message: "Текст отзыва обязателен" }}/>
+                error={initial || text.trim() ? null : { message: "Текст отзыва обязателен" }}/>
             <div className={styles.submitWrapper}>
                 {queryState === "pending" ? <UserSpinner/> :
                 <SubmitBtn
                     style={{width: "100%"}}
-                    disabled={queryState !== "idle"}>Отправить</SubmitBtn>}
+                    disabled={queryState !== "idle" || (review && currReview.text === text.trim() && currReview.mark === mark)}>
+                        {review ? "Сохранить изменения" : "Отправить"}</SubmitBtn>}
                 {queryState === "error" &&
                 <FormHelperText sx={helperStyle} error>Произошла ошибка</FormHelperText>}
                 {queryState === "fulfilled" &&
