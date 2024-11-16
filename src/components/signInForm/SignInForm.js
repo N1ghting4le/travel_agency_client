@@ -24,7 +24,7 @@ const SignInForm = () => {
     const [error, setError] = useState("");
     const router = useRouter();
 
-    const { control, handleSubmit, reset, formState: { errors } } = useForm({
+    const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     });
 
@@ -39,7 +39,6 @@ const SignInForm = () => {
                 setToken(token);
                 localStorage.setItem("token", token);
                 router.back();
-                reset();
             })
             .catch(err => {
                 setError(err.message);

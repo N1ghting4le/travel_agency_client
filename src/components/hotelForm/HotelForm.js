@@ -9,6 +9,7 @@ import Stars from "../stars/Stars";
 import Photos from "../photos/Photos";
 import SubmitBtn from "../submitBtn/SubmitBtn";
 import AdminSpinner from "../loadingSpinners/AdminSpinner";
+import ResetHoc from "../ResetHoc";
 import { Checkbox, FormControlLabel, FormHelperText } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
@@ -23,13 +24,13 @@ import nutritionTypes from "@/lists/nutritionTypes";
 import roomTypes from "@/lists/roomTypes";
 import countries from "@/lists/countries";
 
-const HotelForm = () => {
+const HotelForm = ResetHoc(({ reset }) => {
     const { isAdmin } = useAdmin();
     const { token } = useToken();
     const router = useRouter();
     const [stars, setStars] = useState(1);
 
-    const { register, control, trigger, handleSubmit, reset, formState: { errors } } = useForm({
+    const { register, control, trigger, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             nutritionTypes: [],
@@ -61,7 +62,7 @@ const HotelForm = () => {
         photos.forEach(photo => formData.append("photos", photo));
 
         query(`${BASE_URL}/hotel/add`, "POST", {'authorization': `Bearer ${token}`}, formData)
-            .then(() => reset())
+            .then(() => setTimeout(reset, 2000))
             .finally(() => setTimeout(resetQueryState, 2000));
     }
 
@@ -152,6 +153,6 @@ const HotelForm = () => {
             </div>
         </form>
     ) : null;
-}
+});
 
 export default HotelForm;

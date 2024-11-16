@@ -6,6 +6,7 @@ import Input from "../input/Input";
 import SelectMenu from "../selectMenu/SelectMenu";
 import SubmitBtn from "../submitBtn/SubmitBtn";
 import AdminSpinner from "../loadingSpinners/AdminSpinner";
+import ResetHoc from "../ResetHoc";
 import { FormHelperText } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
@@ -20,14 +21,14 @@ import departureCities from "@/lists/departureCities";
 import countries from "@/lists/countries";
 import { BASE_URL } from "@/env";
 
-const TourForm = ({ tour }) => {
+const TourForm = ResetHoc(({ tour, reset }) => {
     const { isAdmin } = useAdmin();
     const { token } = useToken();
     const { changeTour } = useTours();
     const router = useRouter();
     const [hotels, setHotels] = useState(tour ? [{hotel_title: tour.hotel_title, id: tour.hotel_id}] : []);
 
-    const { control, handleSubmit, reset, formState: { errors }, resetField } = useForm({
+    const { control, handleSubmit, formState: { errors }, resetField } = useForm({
         resolver: yupResolver(schema),
         mode: "onChange",
         defaultValues: {
@@ -59,11 +60,7 @@ const TourForm = ({ tour }) => {
         }, headers = {'Content-type': 'application/json', 'authorization': `Bearer ${token}`};
 
         q2(`${BASE_URL}/tour/${tour ? `edit/${id}` : "add"}`, tour ? "PATCH" : "POST", headers, JSON.stringify(body))
-            .then(res => {
-                if (tour) changeTour(res);
-
-                reset();
-            })
+            .then(res => tour ? changeTour(res) : setTimeout(reset, 2000))
             .finally(() => setTimeout(resetQueryState, 2000));
     }
 
@@ -160,6 +157,6 @@ const TourForm = ({ tour }) => {
             </> : null}
         </form>
     ) : null;
-}
+});
 
 export default TourForm;

@@ -25,7 +25,7 @@ const SignUpForm = () => {
     const [error, setError] = useState("");
     const router = useRouter();
 
-    const { control, handleSubmit, reset, formState: { errors } } = useForm({
+    const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     });
 
@@ -46,7 +46,6 @@ const SignUpForm = () => {
                 setToken(res);
                 setUser(user);
                 router.back();
-                reset();
             })
             .catch(err => {
                 setError(err.message);
