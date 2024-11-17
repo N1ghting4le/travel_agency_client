@@ -24,49 +24,19 @@ const BookingsList = ({ bookings }) => {
         const startDateStr = new Date(start_date).toLocaleDateString("ru-RU", options);
         const endDateStr = new Date(end_date).toLocaleDateString("ru-RU", options);
 
+        const itemArr = [
+            ["Тур", tour_title], ["Начало", startDateStr], ["Конец", endDateStr],
+            ["Отель", hotel_title], ["Тип номера", room_type], ["Тип питания", nutrition_type],
+            ["Кол-во взрослых", adults_amount], ["Кол-во детей", children_amount]
+        ];
+
         return (
             <li key={id} className={styles.bookingItem}>
-                <div className={styles.dateInfo}>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Начало</p>
-                        <p className={styles.info}>{startDateStr}</p>
-                    </div>
-                    <p className={styles.info}>—</p>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Конец</p>
-                        <p className={styles.info}>{endDateStr}</p>
-                    </div>
-                </div>
-                <div className={styles.infoItemWrapper}>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Тур</p>
-                        <p className={styles.info}>{tour_title}</p>
-                    </div>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Отель</p>
-                        <p className={styles.info}>{hotel_title}</p>
-                    </div>
-                </div>
-                <div className={styles.infoItemWrapper}>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Тип номера</p>
-                        <p className={styles.info}>{room_type}</p>
-                    </div>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Тип питания</p>
-                        <p className={styles.info}>{nutrition_type}</p>
-                    </div>
-                </div>
-                <div className={styles.infoItemWrapper}>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Кол-во взрослых</p>
-                        <p className={styles.info}>{adults_amount}</p>
-                    </div>
-                    <div className={styles.infoItem}>
-                        <p className={styles.title}>Кол-во детей</p>
-                        <p className={styles.info}>{children_amount}</p>
-                    </div>
-                </div>
+                {itemArr.map(([title, info]) =>
+                <div key={title} className={styles.infoItem}>
+                    <p className={styles.title}>{title}</p>
+                    <p className={styles.info}>{info}</p>
+                </div>)}
                 <div className={styles.infoItem}>
                     <p className={styles.title}>Цена</p>
                     <p className={styles.price}>${total_price}</p>
