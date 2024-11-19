@@ -21,12 +21,12 @@ import departureCities from "@/lists/departureCities";
 import countries from "@/lists/countries";
 import { BASE_URL } from "@/env";
 
-const TourForm = ResetHoc(({ tour, reset }) => {
+const TourForm = ResetHoc(({ tour, countryHotels, reset }) => {
     const { isAdmin } = useAdmin();
     const { token } = useToken();
     const { changeTour } = useTours();
     const router = useRouter();
-    const [hotels, setHotels] = useState(tour ? [{hotel_title: tour.hotel_title, id: tour.hotel_id}] : []);
+    const [hotels, setHotels] = useState(tour ? countryHotels : []);
 
     const { control, handleSubmit, formState: { errors, isDirty, defaultValues }, setValue, getValues, reset: formReset } = useForm({
         resolver: yupResolver(schema),

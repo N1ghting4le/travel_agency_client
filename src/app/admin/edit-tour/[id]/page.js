@@ -15,13 +15,15 @@ export const getData = async (url) => {
     return await res.json();
 }
 
-const EditTourPage = async ({ params }) => {
-    const tour = await getData(`${BASE_URL}/tour/get/${params.id}`);
+const EditTourPage = async ({ params, searchParams }) => {
+    const [tour, hotels] = await Promise.all([
+        getData(`${BASE_URL}/tour/get/${params.id}`),
+        getData(`${BASE_URL}/hotel/getHotels/${searchParams.country}`)
+    ]);
     const {
         id, departure_city, destination_country, tour_title, tour_descr, tour_notes, hotel_title,
         base_price, hotel_id
     } = tour;
-    
     const editedTour = {
         id, departure_city, destination_country, title: tour_title, descr: tour_descr,
         notes: tour_notes, hotel_title, base_price, hotel_id
@@ -30,7 +32,7 @@ const EditTourPage = async ({ params }) => {
     return (
         <main className={styles.main}>
             <h1>Редактирование тура</h1>
-            <TourForm tour={editedTour}/>
+            <TourForm tour={editedTour} countryHotels={hotels}/>
         </main>
     );
 }

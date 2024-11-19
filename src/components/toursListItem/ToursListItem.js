@@ -61,7 +61,7 @@ const ToursListItem = ({ id, tourTitle, hotelTitle, price, avgMark, resort, mark
                     </Link>
                     {isAdmin &&
                     <>
-                    <Link href={`/admin/edit-tour/${id}`}>
+                    <Link href={`/admin/edit-tour/${id}?country=${country}`}>
                         <EditIcon/>
                     </Link>
                     <DeleteIcon style={{cursor: "pointer"}} onClick={removeTour}/>
