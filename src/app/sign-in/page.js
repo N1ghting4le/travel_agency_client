@@ -18,7 +18,7 @@ const SignInPage = () => {
                 <SignInForm/>
                 <p style={{alignSelf: "center"}}>
                     Нет аккаунта?
-                    <Link href="/sign-up" style={{color: "salmon"}}> Регистрация</Link>
+                    <Link href="/sign-up" style={{color: "salmon"}} replace> Регистрация</Link>
                 </p>
             </div>
             <Image src={picture} alt="sign up picture" className={styles.picture} priority/>

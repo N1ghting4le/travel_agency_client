@@ -35,7 +35,7 @@ const amounts = [
     ["Кол-во детей", "childrenAmount", 0]
 ];
 
-const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice }) => {
+const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice, setCanClose }) => {
     const [totalPrice, setTotalPrice] = useState(basePrice);
     const { token } = useToken();
     const [booking, setBooking] = useState({
@@ -78,6 +78,8 @@ const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice }) => {
     const changeEndDate = (endDate) => setBooking(booking => ({...booking, endDate}));
 
     const onSubmit = (data) => {
+        setCanClose(false);
+
         const body = {
             id: uuid(),
             userId,
@@ -94,7 +96,10 @@ const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice }) => {
             "POST",
             {'Content-type': 'application/json', 'authorization': `Bearer ${token}`},
             JSON.stringify(body)
-        ).finally(() => setTimeout(resetQueryState, 2000));
+        ).finally(() => {
+            setTimeout(resetQueryState, 2000);
+            setCanClose(true);
+        });
     }
 
     const renderInputs = () => amounts.map(([text, name, defaultValue]) => (

@@ -25,6 +25,9 @@ const GlobalContext = ({ children }) => {
         setAdmin: () => setState(state => ({...state, isAdmin: true})),
         logout: () => setState(state => ({...state, user: null, isAdmin: false})),
         setTours,
+        changeAvgMark: (id, avgMark, amount) => setTours(state.tours.map(tour => tour.id === id ? {
+            ...tour, avg_mark: avgMark, amount
+        } : tour)),
         changeTour: (data) => setTours(state.tours.map(tour => tour.id === data.id ? {
             ...tour,
             tour_title: data.tour_title,
@@ -71,9 +74,9 @@ const useAdmin = () => {
 
 const useTours = () => {
     const context = useContext(Context);
-    const { tours, setTours, changeTour, deleteTour } = context;
+    const { tours, setTours, changeTour, changeAvgMark, deleteTour } = context;
 
-    return { tours, setTours, changeTour, deleteTour };
+    return { tours, setTours, changeTour, changeAvgMark, deleteTour };
 }
 
 export { useUser, useLogout, useToken, useAdmin, useTours };

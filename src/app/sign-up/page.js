@@ -19,7 +19,7 @@ const SignUpPage = () => {
                 <SignUpForm/>
                 <p style={{alignSelf: "center"}}>
                     Уже зарегистрированы?
-                    <Link href="/sign-in" style={{color: "salmon"}}> Вход</Link>
+                    <Link href="/sign-in" style={{color: "salmon"}} replace> Вход</Link>
                 </p>
             </div>
         </main>

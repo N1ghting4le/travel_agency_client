@@ -13,7 +13,7 @@ import SubmitBtn from "../submitBtn/SubmitBtn";
 import { FormHelperText } from "@mui/material";
 import UserSpinner from "../loadingSpinners/UserSpinner";
 
-const ReviewForm = ({ setReviews, review, tourId }) => {
+const ReviewForm = ({ setReviews, review, tourId, setCanClose }) => {
     const [currReview, setCurrReview] = useState({
         text: review?.review_text || "",
         mark: review?.mark || 1
@@ -32,8 +32,8 @@ const ReviewForm = ({ setReviews, review, tourId }) => {
         setInitial(false);
 
         const trimmedText = text.trim();
-
         if (!trimmedText) return;
+        setCanClose(false);
 
         const body = {
             id: review?.id || uuid(),
@@ -58,7 +58,10 @@ const ReviewForm = ({ setReviews, review, tourId }) => {
                     setCurrReview({ text: trimmedText, mark: body.mark });
                 } else setReviews(reviews => [...reviews, { ...rest, name: user.name, surname: user.surname }]);
             })
-            .finally(() => setTimeout(resetQueryState, 2000));
+            .finally(() => {
+                setTimeout(resetQueryState, 2000);
+                setCanClose(true);
+            });
     }
 
     return (

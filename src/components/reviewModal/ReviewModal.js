@@ -2,6 +2,7 @@
 
 import styles from "../bookTourModal/bookTourModal.module.css";
 import { Modal, Box } from "@mui/material";
+import { useState } from "react";
 import ReviewForm from "../reviewForm/ReviewForm";
 
 const style = {
@@ -16,7 +17,11 @@ const style = {
 };
 
 const ReviewModal = ({ open, setOpen, setReviews, review, tourId }) => {
+    const [canClose, setCanClose] = useState(true);
+    
     const handleClose = () => {
+        if (!canClose) return;
+
         setOpen(false);
         document.scrollingElement.style.overflow = "auto";
     }
@@ -31,7 +36,8 @@ const ReviewModal = ({ open, setOpen, setReviews, review, tourId }) => {
                 <ReviewForm
                     setReviews={setReviews}
                     review={review}
-                    tourId={tourId}/>
+                    tourId={tourId}
+                    setCanClose={setCanClose}/>
             </Box>
         </Modal>
     );

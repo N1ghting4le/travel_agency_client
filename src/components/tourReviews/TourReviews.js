@@ -4,7 +4,7 @@ import { BASE_URL } from "@/env";
 import styles from "./tourReviews.module.css";
 import useQuery from "@/hooks/query.hook";
 import { useState, useEffect } from "react";
-import { useAdmin, useUser } from "../GlobalContext";
+import { useAdmin, useUser, useTours } from "../GlobalContext";
 import { useRouter } from "next/navigation";
 import TourLoading from "../loadingSpinners/TourLoading";
 import ReviewModal from "../reviewModal/ReviewModal";
@@ -28,19 +28,24 @@ const TourReviews = ({ id }) => {
     const { query, queryState } = useQuery();
     const { isAdmin } = useAdmin();
     const { user } = useUser();
+    const { changeAvgMark } = useTours();
     const router = useRouter();
+
+    const avgMark = (reviews.reduce((sum, curr) => sum + curr.mark, 0) / (reviews.length || 1)).toFixed(1);
 
     const getReviews = () => {
         query(`${BASE_URL}/review/get/${id}`).then(res => setReviews(res));
     }
 
     useEffect(getReviews, []);
+    useEffect(() => changeAvgMark(id, avgMark, reviews.length), [reviews]);
 
     const openModal = (review = null) => {
         if (!review && !user) return router.push("/sign-in");
 
         setReview(review);
         setOpen(true);
+        document.scrollingElement.style.overflow = "hidden";
     }
 
     const renderReviews = () => reviews.map(item => {
@@ -84,7 +89,7 @@ const TourReviews = ({ id }) => {
                     <h2>Отзывы:</h2>
                     <div className={styles.avgRatingWrapper}>
                         <p className={styles.avgRating}>
-                            {(reviews.reduce((sum, curr) => sum + curr.mark, 0) / (reviews.length || 1)).toFixed(1)}
+                            {avgMark}
                         </p>
                         <p className={styles.amount}>{reviewStr(reviews.length)}</p>
                     </div>

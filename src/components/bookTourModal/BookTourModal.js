@@ -20,6 +20,7 @@ const style = {
 
 const BookTourModal = ({ id, roomTypes, nutrTypes, basePrice }) => {
     const [open, setOpen] = useState(false);
+    const [canClose, setCanClose] = useState(true);
     const { isAdmin } = useAdmin();
     const { user } = useUser();
     const router = useRouter();
@@ -32,6 +33,8 @@ const BookTourModal = ({ id, roomTypes, nutrTypes, basePrice }) => {
     }
 
     const handleClose = () => {
+        if (!canClose) return;
+
         setOpen(false);
         document.scrollingElement.style.overflow = "auto";
     }
@@ -50,7 +53,8 @@ const BookTourModal = ({ id, roomTypes, nutrTypes, basePrice }) => {
                         userId={user?.id}
                         roomTypes={roomTypes}
                         nutrTypes={nutrTypes}
-                        basePrice={basePrice}/>
+                        basePrice={basePrice}
+                        setCanClose={setCanClose}/>
                 </Box>
             </Modal>
         </div>
