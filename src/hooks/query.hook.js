@@ -14,7 +14,7 @@ const useQuery = () => {
                 data = await (res.headers.get('Content-type')?.includes("json") ? res.json() : res.text());
 
                 if (!res.ok) {
-                    throw new Error(data);
+                    throw new Error(data.error || data);
                 }
 
                 setQueryState('fulfilled');
