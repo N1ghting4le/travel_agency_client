@@ -35,9 +35,10 @@ const amounts = [
     ["Кол-во детей", "childrenAmount", 0]
 ];
 
-const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice, setCanClose }) => {
+const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handleClose }) => {
     const [totalPrice, setTotalPrice] = useState(basePrice);
     const { token } = useToken();
+    const [errorMsg, setErrorMsg] = useState("");
     const [booking, setBooking] = useState({
         roomType: 1,
         nutrType: 1,
@@ -82,7 +83,6 @@ const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice, setCanClos
 
         const body = {
             id: uuid(),
-            userId,
             tourId: id,
             startDate: booking.startDate.toDate(),
             endDate: booking.endDate.toDate(),
@@ -96,10 +96,13 @@ const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice, setCanClos
             "POST",
             {'Content-type': 'application/json', 'authorization': `Bearer ${token}`},
             JSON.stringify(body)
-        ).finally(() => {
+        )
+        .then(() => setTimeout(handleClose, 2000))
+        .catch(err => {
+            setErrorMsg(err.message);
             setTimeout(resetQueryState, 2000);
-            setCanClose(true);
-        });
+        })
+        .finally(() => setCanClose(true));
     }
 
     const renderInputs = () => amounts.map(([text, name, defaultValue]) => (
@@ -188,7 +191,7 @@ const BookForm = ({ id, userId, roomTypes: rts, nutrTypes, basePrice, setCanClos
                     style={{width: "100%"}}
                     disabled={queryState !== "idle"}>Забронировать</SubmitBtn>}
                 {queryState === "error" &&
-                <FormHelperText sx={helperStyle} error>Произошла ошибка</FormHelperText>}
+                <FormHelperText sx={helperStyle} error>{errorMsg}</FormHelperText>}
                 {queryState === "fulfilled" &&
                 <FormHelperText sx={{...helperStyle, color: "green"}}>Тур забронирован</FormHelperText>}
             </div>

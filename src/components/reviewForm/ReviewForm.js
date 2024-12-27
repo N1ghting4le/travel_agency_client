@@ -13,7 +13,7 @@ import SubmitBtn from "../submitBtn/SubmitBtn";
 import { FormHelperText } from "@mui/material";
 import UserSpinner from "../loadingSpinners/UserSpinner";
 
-const ReviewForm = ({ setReviews, review, tourId, setCanClose }) => {
+const ReviewForm = ({ setReviews, review, tourId, setCanClose, handleClose }) => {
     const [currReview, setCurrReview] = useState({
         text: review?.review_text || "",
         mark: review?.mark || 1
@@ -21,6 +21,7 @@ const ReviewForm = ({ setReviews, review, tourId, setCanClose }) => {
     const [mark, setMark] = useState(currReview.mark);
     const [text, setText] = useState(currReview.text);
     const [initial, setInitial] = useState(true);
+    const [errorMsg, setErrorMsg] = useState("");
     const { user } = useUser();
     const { token } = useToken();
     const { query, queryState, resetQueryState } = useQuery();
@@ -37,7 +38,6 @@ const ReviewForm = ({ setReviews, review, tourId, setCanClose }) => {
 
         const body = {
             id: review?.id || uuid(),
-            user_id: user?.id,
             review_user_id: review?.user_id,
             tour_id: tourId,
             review_date: new Date(),
@@ -56,12 +56,15 @@ const ReviewForm = ({ setReviews, review, tourId, setCanClose }) => {
                         ...item, mark: body.mark, review_text: body.review_text
                     }) : item));
                     setCurrReview({ text: trimmedText, mark: body.mark });
-                } else setReviews(reviews => [...reviews, { ...rest, name: user.name, surname: user.surname }]);
+                } else setReviews(reviews => [...reviews, { ...rest, user_id: user.id, name: user.name, surname: user.surname }]);
+
+                setTimeout(handleClose, 2000);
             })
-            .finally(() => {
+            .catch(err => {
+                setErrorMsg(err.message);
                 setTimeout(resetQueryState, 2000);
-                setCanClose(true);
-            });
+            })
+            .finally(() => setCanClose(true));
     }
 
     return (
@@ -84,7 +87,7 @@ const ReviewForm = ({ setReviews, review, tourId, setCanClose }) => {
                     disabled={queryState !== "idle" || (review && currReview.text === text.trim() && currReview.mark === mark)}>
                         {review ? "Сохранить изменения" : "Отправить"}</SubmitBtn>}
                 {queryState === "error" &&
-                <FormHelperText sx={helperStyle} error>Произошла ошибка</FormHelperText>}
+                <FormHelperText sx={helperStyle} error>{errorMsg}</FormHelperText>}
                 {queryState === "fulfilled" &&
                 <FormHelperText sx={{...helperStyle, color: "green"}}>Отзыв отправлен</FormHelperText>}
             </div>

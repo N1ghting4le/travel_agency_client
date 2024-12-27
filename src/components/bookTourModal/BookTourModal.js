@@ -50,11 +50,11 @@ const BookTourModal = ({ id, roomTypes, nutrTypes, basePrice }) => {
                     <p className={styles.close} onClick={handleClose}>+</p>
                     <BookForm
                         id={id}
-                        userId={user?.id}
                         roomTypes={roomTypes}
                         nutrTypes={nutrTypes}
                         basePrice={basePrice}
-                        setCanClose={setCanClose}/>
+                        setCanClose={setCanClose}
+                        handleClose={handleClose}/>
                 </Box>
             </Modal>
         </div>

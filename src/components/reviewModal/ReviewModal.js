@@ -37,7 +37,8 @@ const ReviewModal = ({ open, setOpen, setReviews, review, tourId }) => {
                     setReviews={setReviews}
                     review={review}
                     tourId={tourId}
-                    setCanClose={setCanClose}/>
+                    setCanClose={setCanClose}
+                    handleClose={handleClose}/>
             </Box>
         </Modal>
     );
