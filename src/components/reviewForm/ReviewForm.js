@@ -52,11 +52,15 @@ const ReviewForm = ({ setReviews, review, tourId, setCanClose, handleClose }) =>
         }, JSON.stringify(body))
             .then(() => {
                 if (review) {
-                    setReviews(reviews => reviews.map(item => item.id === review.id ? ({
-                        ...item, mark: body.mark, review_text: body.review_text
-                    }) : item));
+                    setReviews(reviews => reviews.map(item => item.id === review.id ? {
+                        ...item, review_text: trimmedText, mark: body.mark
+                    } : item));
                     setCurrReview({ text: trimmedText, mark: body.mark });
-                } else setReviews(reviews => [...reviews, { ...rest, user_id: user.id, name: user.name, surname: user.surname }]);
+                } else {
+                    const { id, name, surname } = user;
+                    
+                    setReviews(reviews => [...reviews, { ...rest, user_id: id, name, surname }]);
+                }
 
                 setTimeout(handleClose, 2000);
             })

@@ -6,7 +6,7 @@
     width: 100%;
 }
 
-.poshelNahui {
+.fieldsWrapper {
     display: grid;
     grid-template-rows: auto auto;
     grid-template-columns: 1fr 1fr;
@@ -24,7 +24,7 @@
 }
 
 @media (max-width: 593px) {
-    .poshelNahui {
+    .fieldsWrapper {
         display: flex;
         flex-direction: column;
     }

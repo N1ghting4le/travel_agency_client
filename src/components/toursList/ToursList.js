@@ -70,25 +70,7 @@ const ToursList = ({ queryState }) => {
         return base_price >= priceRange[0] && base_price <= priceRange[1] && +avg_mark >= minRating
                 && nutrition_types.some(type => activeNutrTypes.includes(type))
                 && room_types.some(type => activeRoomTypes.includes(type))
-    }).map(tour => {
-        const {
-            id, tour_title, resort, destination_country, avg_mark,
-            photo, stars, amount, base_price, hotel_title
-        } = tour;
-
-        return <ToursListItem
-                    key={id}
-                    id={id}
-                    tourTitle={tour_title}
-                    hotelTitle={hotel_title}
-                    resort={resort}
-                    country={destination_country}
-                    photo={photo}
-                    stars={stars}
-                    marksAmount={+amount}
-                    price={base_price}
-                    avgMark={(+avg_mark).toFixed(1)}/>;
-    });
+    }).map(tour => <ToursListItem key={tour.id} tour={tour}/>);
 
     switch (queryState) {
         case "pending": return <TourLoading/>;

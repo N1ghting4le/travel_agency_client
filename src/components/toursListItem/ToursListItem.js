@@ -11,7 +11,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AdminSpinner from "../loadingSpinners/AdminSpinner";
 import { reviewStr } from "../tourReviews/TourReviews";
 
-const ToursListItem = ({ id, tourTitle, hotelTitle, price, avgMark, resort, marksAmount, country, photo, stars }) => {
+const ToursListItem = ({ tour }) => {
+    const {
+        id, tour_title: tourTitle, resort, destination_country: country, avg_mark: avgMark,
+        photo, stars, amount: marksAmount, base_price: price, hotel_title: hotelTitle
+    } = tour;
     const { isAdmin } = useAdmin();
     const { deleteTour } = useTours();
     const { token } = useToken();
@@ -52,7 +56,7 @@ const ToursListItem = ({ id, tourTitle, hotelTitle, price, avgMark, resort, mark
                 <p>{hotelTitle}</p>
                 <DisplayStars stars={stars}/>
                 <div className={styles.marks}>
-                    <p className={styles.mark}>{avgMark}</p>
+                    <p className={styles.mark}>{(+avgMark).toFixed(1)}</p>
                     <p>{reviewStr(marksAmount)}</p>
                 </div>
                 <div className={styles.btnWrapper}>

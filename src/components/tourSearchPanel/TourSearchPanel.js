@@ -15,8 +15,8 @@ import roomTypes from "@/lists/roomTypes";
 const forMenus = [
     ["Город вылета", "departureCity", departureCities, false, FlightTakeoff],
     ["Страна", "destinationCountry", countries, false, FlightLand],
-    ["Типы питания", "nutrition", nutritionTypes.map(({ value, descr }) => `${value} - ${descr}`), true, Restaurant],
-    ["Типы номеров", "rooms", roomTypes.map(({ value, descr }) => `${value} - ${descr}`), true, KingBed]
+    ["Типы питания", "nutrition", nutritionTypes.map(t => `${t.value} - ${t.descr}`), true, Restaurant],
+    ["Типы номеров", "rooms", roomTypes.map(t => `${t.value} - ${t.descr}`), true, KingBed]
 ];
 
 const TourSearchPanel = ({ query, resetQueryState }) => {
@@ -47,12 +47,13 @@ const TourSearchPanel = ({ query, resetQueryState }) => {
             name={name}
             control={control}
             multiple={multiple}
-            defaultValue={multiple ? [] : values[0]}>
-                <div style={{display: "flex", gap: "5px"}}>
-                    <Icon fontSize="small"/>
-                    <p>{text}</p>
-                </div>
-            </SelectMenu>
+            defaultValue={multiple ? [] : values[0]}
+        >
+            <div style={{display: "flex", gap: "5px"}}>
+                <Icon fontSize="small"/>
+                <p>{text}</p>
+            </div>
+        </SelectMenu>
     ));
 
     const menus = renderMenus();

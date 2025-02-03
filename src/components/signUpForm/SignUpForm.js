@@ -33,11 +33,7 @@ const SignUpForm = () => {
 
     const onSubmit = (data) => {
         const { confirmPassword, ...rest } = data;
-
-        const body = {
-            id: uuid(),
-            ...rest
-        };
+        const body = { id: uuid(), ...rest };
 
         query(`${BASE_URL}/auth/signUp`, "POST", {'Content-type': 'application/json'}, JSON.stringify(body))
             .then(res => {
@@ -53,7 +49,7 @@ const SignUpForm = () => {
             });
     }
 
-    const renderFields = () => fields.slice(0, 4).map(({ name, placeholder }) => (
+    const renderFields = (arr, Input) => arr.map(({ name, placeholder }) => (
         <Controller
             key={name}
             name={name}
@@ -68,27 +64,12 @@ const SignUpForm = () => {
         />
     ));
 
-    const renderPasswordFields = () => fields.slice(4).map(({ name, placeholder }) => (
-        <Controller
-            key={name}
-            name={name}
-            control={control}
-            render={
-                ({ field: { onChange } }) =>
-                    <PasswordInput
-                        placeholder={placeholder}
-                        error={errors[name]}
-                        onChange={onChange}/>
-            }
-        />
-    ));
-
-    const fieldsEls = renderFields();
-    const passwordFields = renderPasswordFields();
+    const fieldsEls = renderFields(fields.slice(0, 4), Input);
+    const passwordFields = renderFields(fields.slice(4), PasswordInput);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-            <div className={styles.poshelNahui}>
+            <div className={styles.fieldsWrapper}>
                 {fieldsEls}
             </div>
             {passwordFields}
