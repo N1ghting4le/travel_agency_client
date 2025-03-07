@@ -1,6 +1,6 @@
 import Header from "@/components/header/Header";
 
-export default function AdminFormsLayout({ children }) {
+export default function AdminOrEmployeeLayout({ children }) {
   return (
     <>
     <Header/>

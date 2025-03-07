@@ -7,18 +7,16 @@ import Input from "../input/Input";
 import SelectMenu from "../selectMenu/SelectMenu";
 import Stars from "../stars/Stars";
 import Photos from "../photos/Photos";
-import SubmitBtn from "../submitBtn/SubmitBtn";
 import AdminSpinner from "../loadingSpinners/AdminSpinner";
 import ResetHoc from "../ResetHoc";
+import SubmitWrapper from "../submitWrapper/SubmitWrapper";
 import { Checkbox, FormControlLabel, FormHelperText } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAdmin, useToken } from "../GlobalContext";
 import useQuery from "@/hooks/query.hook";
 import schema from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { v4 as uuid } from "uuid";
 import { textFields, largeTextFields } from "./fields";
 import nutritionTypes from "@/lists/nutritionTypes";
 import roomTypes from "@/lists/roomTypes";
@@ -27,41 +25,43 @@ import countries from "@/lists/countries";
 const HotelForm = ResetHoc(({ reset }) => {
     const { isAdmin } = useAdmin();
     const { token } = useToken();
-    const router = useRouter();
     const [stars, setStars] = useState(1);
+    const [resorts, setResorts] = useState([]);
 
-    const { register, control, trigger, handleSubmit, formState: { errors } } = useForm({
+    const { register, control, trigger, handleSubmit, formState: { errors }, watch, setValue } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
             nutritionTypes: [],
-            roomTypes: []
+            roomTypes: [],
+            country: '',
+            resort: ''
         },
         mode: "onChange"
     });
 
     const { query, queryState, resetQueryState } = useQuery();
-    
+    const { query: getResorts, queryState: resortsState } = useQuery();
+    const country = watch("country");
+
     useEffect(() => {
-        if (!isAdmin) router.push("/403");
-    }, [isAdmin]);
+        setResorts([]);
+        setValue("resorts", []);
+
+        if (country) {
+            getResorts(`${BASE_URL}/resort/get/${country}`)
+                .then(res => setResorts(res.map(r => r.resortTitle)));
+        }
+    }, [country]);
 
     const onSubmit = (data) => {
         const { photos, ...rest } = data;
-
-        const body = {
-            id: uuid(),
-            ...rest,
-            stars,
-            images: photos.map(item => item.name)
-        }
-
         const formData = new FormData();
 
-        Object.entries(body).forEach(([key, value]) => formData.append(key, value));
-
+        Object.entries(rest).forEach(([key, value]) => formData.append(key, value));
         photos.forEach(photo => formData.append("photos", photo));
+        formData.append("stars", stars);
 
-        query(`${BASE_URL}/hotel/add`, "POST", {'authorization': `Bearer ${token}`}, formData)
+        query(`${BASE_URL}/hotel/create`, "POST", {'authorization': `Bearer ${token}`}, formData)
             .then(() => setTimeout(reset, 2000))
             .finally(() => setTimeout(resetQueryState, 2000));
     }
@@ -99,10 +99,7 @@ const HotelForm = ResetHoc(({ reset }) => {
                         {...register(`${name}.${i}`, { onChange: () => trigger(name) })}/>
                 }
                 label={`${value} - ${descr}`}
-                sx={{
-                    "& .MuiFormControlLabel-label": { fontFamily: labelStyle.fontFamily },
-                    width: "min(100%, max-content)"
-                }}
+                sx={{ width: "min(100%, max-content)" }}
             />
         );
     });
@@ -116,11 +113,17 @@ const HotelForm = ResetHoc(({ reset }) => {
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form} encType="multipart/form-data">
             <div className={styles.textFieldsWrapper}>
                 {textFieldsEls}
-                <SelectMenu 
+                <SelectMenu
                     values={countries}
                     name="country"
                     control={control}
                     error={errors.country}>Страна</SelectMenu>
+                <SelectMenu
+                    values={resorts}
+                    name="resort"
+                    control={control}
+                    error={errors.resort}
+                    disabled={resortsState !== 'fulfilled'}>Курорт</SelectMenu>
             </div>
             <div className={styles.starsWrapper}>
                 <h3>Установите звёздность</h3>
@@ -142,15 +145,12 @@ const HotelForm = ResetHoc(({ reset }) => {
             <div className={styles.textFieldsWrapper}>
                 {largeTextFieldsEls}
             </div>
-            <div className={styles.submitWrapper}>
-                {queryState === "pending" ? <AdminSpinner/> : <SubmitBtn
-                                                                disabled={queryState !== "idle"}
-                                                                style={{width: "100%"}}>Добавить</SubmitBtn>}
-                {queryState === "error" &&
-                <FormHelperText sx={helperStyle} error>Произошла ошибка</FormHelperText>}
-                {queryState === "fulfilled" &&
-                <FormHelperText sx={{...helperStyle, color: "green"}}>Отель успешно добавлен</FormHelperText>}
-            </div>
+            <SubmitWrapper
+                queryState={queryState}
+                spinner={<AdminSpinner/>}
+                btnText="Добавить"
+                errorMsg="Произошла ошибка"
+                successText="Отель успешно добавлен"/>
         </form>
     ) : null;
 });

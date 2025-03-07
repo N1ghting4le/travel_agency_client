@@ -13,9 +13,10 @@ import { reviewStr } from "../tourReviews/TourReviews";
 
 const ToursListItem = ({ tour }) => {
     const {
-        id, tour_title: tourTitle, resort, destination_country: country, avg_mark: avgMark,
-        photo, stars, amount: marksAmount, base_price: price, hotel_title: hotelTitle
+        id, tourTitle, destinationCountry: country, hotel,
+        avgMark, amount: marksAmount, basePrice: price
     } = tour;
+    const { hotelTitle, resort, photo, stars } = hotel;
     const { isAdmin } = useAdmin();
     const { deleteTour } = useTours();
     const { token } = useToken();
@@ -44,7 +45,7 @@ const ToursListItem = ({ tour }) => {
         <>
         <li className={styles.listItem}>
             <img 
-                src={`${BASE_URL}/${country}/${resort}/${hotelTitle}/${photo}`}
+                src={`${BASE_URL}/uploads/${country}/${resort}/${hotelTitle}/${photo}`}
                 alt={`${hotelTitle} photo`}
                 className={styles.photo}/>
             <div className={styles.info}>
@@ -56,7 +57,7 @@ const ToursListItem = ({ tour }) => {
                 <p>{hotelTitle}</p>
                 <DisplayStars stars={stars}/>
                 <div className={styles.marks}>
-                    <p className={styles.mark}>{(+avgMark).toFixed(1)}</p>
+                    <p className={styles.mark}>{avgMark.toFixed(1)}</p>
                     <p>{reviewStr(marksAmount)}</p>
                 </div>
                 <div className={styles.btnWrapper}>
@@ -65,7 +66,7 @@ const ToursListItem = ({ tour }) => {
                     </Link>
                     {isAdmin &&
                     <>
-                    <Link href={`/admin/edit-tour/${id}?country=${country}`}>
+                    <Link href={`/admin/edit-tour/${id}`}>
                         <EditIcon/>
                     </Link>
                     <DeleteIcon style={{cursor: "pointer"}} onClick={removeTour}/>

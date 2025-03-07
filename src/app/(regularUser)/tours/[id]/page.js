@@ -9,25 +9,29 @@ import LocationCityIcon from '@mui/icons-material/LocationCity';
 import LanguageIcon from '@mui/icons-material/Language';
 import SurfingIcon from '@mui/icons-material/Surfing';
 import PinDropIcon from '@mui/icons-material/PinDrop';
-import { getData } from "@/app/admin/edit-tour/[id]/page";
+import { getData } from "@/app/(adminOrEmployee)/admin/edit-tour/[id]/page";
 
 const TourPage = async ({ params }) => {
     const tour = await getData(`${BASE_URL}/tour/get/${params.id}`);
     const {
-        id, departure_city, destination_country, tour_title, tour_descr, tour_notes,
-        hotel_title, resort, address, hotel_descr, stars, hotel_notes, base_price,
-        nutrition_types, room_types, photos
+        departureCity, destinationCountry, tourTitle,
+        id, tourDescr, tourNotes, hotel, basePrice,
     } = tour;
+    const {
+        hotelTitle, resort, address, hotelDescr, stars,
+        hotelNotes, nutritionTypes, roomTypes, photos
+    } = hotel;
+    const { resortTitle } = resort;
 
     const tourInfoArr = [
-        [LocationCityIcon, "Город вылета:", departure_city],
-        [LanguageIcon, "Страна прибытия:", destination_country],
-        [SurfingIcon, "Курорт:", resort]
+        [LocationCityIcon, "Город вылета:", departureCity],
+        [LanguageIcon, "Страна прибытия:", destinationCountry],
+        [SurfingIcon, "Курорт:", resortTitle]
     ];
 
     return (
         <main className={styles.main}>
-            <h1>{tour_title}</h1>
+            <h1>{tourTitle}</h1>
             <div className={styles.tourInfo}>
                 {tourInfoArr.map(([Icon, title, info]) => (
                     <div key={title} className={styles.tourInfoItem}>
@@ -39,20 +43,20 @@ const TourPage = async ({ params }) => {
                     </div>
                 ))}
                 <p className={styles.priceWrapper}>
-                    от <span className={styles.price}>${base_price}</span>/ночь
+                    от <span className={styles.price}>${basePrice}</span>/ночь
                 </p>
             </div>
-            <p>{tour_descr}</p>
-            {tour_notes &&
+            <p>{tourDescr}</p>
+            {tourNotes &&
             <div className={styles.notes}>
                 <p className={styles.bold}>Примечания:</p>
-                <p className={styles.tourDescr}>{tour_notes}</p>
+                <p className={styles.tourDescr}>{tourNotes}</p>
             </div>}
             <div className={styles.hotelInfo}>
                 <h2>Отель:</h2>
                 <div className={styles.hotelInfoTop}>
                     <div className={styles.mainHotelInfo}>
-                        <h3>{hotel_title}</h3>
+                        <h3>{hotelTitle}</h3>
                         <DisplayStars stars={stars}/>
                         <div className={styles.addressWrapper}>
                             <PinDropIcon/>
@@ -61,30 +65,30 @@ const TourPage = async ({ params }) => {
                     </div>
                     <BookTourModal
                         id={id}
-                        roomTypes={room_types}
-                        nutrTypes={nutrition_types}
-                        basePrice={base_price}/>
+                        roomTypes={roomTypes}
+                        nutrTypes={nutritionTypes}
+                        basePrice={basePrice}/>
                 </div>
                 <div className={styles.photos}>
                     {photos.slice(0, 5).map((src, i) => (
-                        <img 
+                        <img
                             key={src}
-                            src={`${BASE_URL}/${destination_country}/${resort}/${hotel_title}/${src}`}
+                            src={`${BASE_URL}/uploads/${destinationCountry}/${resortTitle}/${hotelTitle}/${src}`}
                             alt={`hotel photo ${i + 1}`}
                             className={styles.photo}/>
                     ))}
                     <AllTourPhotos 
-                        baseSrc={`${BASE_URL}/${destination_country}/${resort}/${hotel_title}`} 
+                        baseSrc={`${BASE_URL}/uploads/${destinationCountry}/${resortTitle}/${hotelTitle}`} 
                         photos={photos}
-                        title={hotel_title}/>
+                        title={hotelTitle}/>
                 </div>
             </div>
             <Divider/>
-            <p>{hotel_descr}</p>
-            {hotel_notes &&
+            <p>{hotelDescr}</p>
+            {hotelNotes &&
             <div className={styles.notes}>
                 <p className={styles.bold}>Примечания:</p>
-                <p className={styles.tourDescr}>{hotel_notes}</p>
+                <p className={styles.tourDescr}>{hotelNotes}</p>
             </div>}
             <TourReviews id={id}/>
         </main>

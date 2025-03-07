@@ -44,7 +44,7 @@ const Photos = ({ control, trigger, error }) => {
     }
    
     const removePhoto = (i) => {
-        setPreviews(previews => [...previews.slice(0, i), ...previews.slice(i + 1)]);
+        setPreviews(previews => previews.filter((_, index) => index !== i));
         remove(i);
     }
 
@@ -59,7 +59,13 @@ const Photos = ({ control, trigger, error }) => {
                             name={`photos.${i}`}
                             render={() => (
                                 <>
-                                <Image src={previews[i]} alt={i + 1} width={200} height={200} className={styles.image}/>
+                                <Image
+                                    src={previews[i]}
+                                    alt={i + 1}
+                                    width={200}
+                                    height={200}
+                                    className={styles.image}
+                                />
                                 <button onClick={() => removePhoto(i)} className={styles.removeIcon}/>
                                 </>
                             )}
@@ -84,9 +90,13 @@ const Photos = ({ control, trigger, error }) => {
                     />
                 </Button>
                 {error &&
-                <FormHelperText sx={helperStyle} error>{error.message || error.root.message}</FormHelperText>}
+                <FormHelperText sx={helperStyle} error>
+                    {error.message || error.root.message}
+                </FormHelperText>}
                 {loadError &&
-                <FormHelperText sx={helperStyle} error>Сюда можно загружать только фотографии</FormHelperText>}
+                <FormHelperText sx={helperStyle} error>
+                    Сюда можно загружать только фотографии
+                </FormHelperText>}
             </div>
         </div>
     );

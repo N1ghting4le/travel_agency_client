@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useState, useEffect, useRef } from "react";
-import styles from "@/app/(default)/tours/[id]/page.module.css";
+import styles from "@/app/(regularUser)/tours/[id]/page.module.css";
 import "./allTourPhotos.css";
 
 const AllTourPhotos = ({ baseSrc, photos, title }) => {
@@ -59,7 +59,7 @@ const AllTourPhotos = ({ baseSrc, photos, title }) => {
                             <div className="TVSliderViewList">
                                 {photos.map((src, i) => (
                                     <div 
-                                        key={src} 
+                                        key={src}
                                         className={`TVPhoto ${i === index ? "TVActive" : ""}`}
                                         style={{backgroundImage: `url("${baseSrc}/${src}")`}}
                                         onClick={() => setIndex(i)}>

@@ -4,8 +4,7 @@ import styles from "./bookTourModal.module.css";
 import { Modal, Box } from "@mui/material";
 import BookForm from "../bookForm/BookForm";
 import { useState } from "react";
-import { useAdmin } from "../GlobalContext";
-import { useUser } from "../GlobalContext";
+import { useAdmin, useUser } from "../GlobalContext";
 import { useRouter } from "next/navigation";
 
 const style = {

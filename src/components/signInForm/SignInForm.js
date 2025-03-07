@@ -1,27 +1,23 @@
 'use client';
 
 import styles from "./signInForm.module.css";
-import { helperStyle } from "../input/Input";
 import { BASE_URL } from "@/env";
 import { Controller } from "react-hook-form";
-import { FormHelperText } from "@mui/material";
 import Input from "../input/Input";
 import PasswordInput from "../passwordInput/PasswordInput";
 import UserSpinner from "../loadingSpinners/UserSpinner";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useUser, useToken, useAdmin } from "../GlobalContext";
 import schema from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useQuery from "@/hooks/query.hook";
-import SubmitBtn from "../submitBtn/SubmitBtn";
+import useAuth from "@/hooks/auth.hook";
+import SubmitWrapper from "../submitWrapper/SubmitWrapper";
 
 const SignInForm = () => {
-    const { setUser } = useUser();
-    const { setToken } = useToken();
-    const { setAdmin } = useAdmin();
     const [error, setError] = useState("");
+    const authorize = useAuth();
     const router = useRouter();
 
     const { control, handleSubmit, formState: { errors } } = useForm({
@@ -31,13 +27,9 @@ const SignInForm = () => {
     const { query, queryState, resetQueryState } = useQuery();
 
     const onSubmit = (data) => {
-        query(`${BASE_URL}/auth/signIn`, "POST", {'Content-type': 'application/json'}, JSON.stringify(data))
+        query(`${BASE_URL}/user/signIn`, "POST", {'Content-type': 'application/json'}, JSON.stringify(data))
             .then(res => {
-                const { token, ...user } = res;
-
-                user.admin ? setAdmin(true) : setUser(user);
-                setToken(token);
-                localStorage.setItem("token", token);
+                authorize(res);
                 router.back();
             })
             .catch(err => {
@@ -70,16 +62,12 @@ const SignInForm = () => {
                             onChange={onChange}/>
                 }
             />
-            <div className={styles.submitWrapper}>
-                {queryState === "pending" ? <UserSpinner/> :
-                <SubmitBtn 
-                    style={{width: "100%"}}
-                    disabled={queryState !== "idle"}>Войти</SubmitBtn>}
-                {queryState === "error" &&
-                <FormHelperText sx={helperStyle} error>{error || "Произошла ошибка"}</FormHelperText>}
-                {queryState === "fulfilled" &&
-                <FormHelperText sx={{...helperStyle, color: "green"}}>Вход выполнен</FormHelperText>}
-            </div>
+            <SubmitWrapper
+                queryState={queryState}
+                spinner={<UserSpinner/>}
+                btnText="Войти"
+                errorMsg={error || "Произошла ошибка"}
+                successText="Вход выполнен"/>
         </form>
     );
 }

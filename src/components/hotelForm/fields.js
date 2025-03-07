@@ -5,11 +5,6 @@ const textFields = [
         error: "Название отеля обязательно"
     },
     {
-        name: "resort",
-        placeholder: "Курорт",
-        error: "Название курорта обязательно"
-    },
-    {
         name: "address",
         placeholder: "Адрес",
         error: "Адрес отеля обязателен"

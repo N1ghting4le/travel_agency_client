@@ -37,8 +37,8 @@ export default function HeaderMenu() {
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleClose}
-                MenuListProps={{
-                    'aria-labelledby': 'basic-button',
+                slotProps={{
+                    list: {'aria-labelledby': 'basic-button'}
                 }}
             >
                 <MenuItem onClick={handleClose} sx={{p: 0}}>

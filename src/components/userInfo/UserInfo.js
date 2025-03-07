@@ -2,18 +2,11 @@
 
 import styles from "./userInfo.module.css";
 import { useUser } from "../GlobalContext";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 
-const UserInfo = () => {
+const UserInfo = ({ userId }) => {
     const { user } = useUser();
-    const router = useRouter();
 
-    useEffect(() => {
-        if (!user) router.push("/403");
-    }, []);
-
-    if (!user) return null;
+    if (user?.id !== userId) return null;
 
     const { name, surname, email, phoneNumber } = user;
 

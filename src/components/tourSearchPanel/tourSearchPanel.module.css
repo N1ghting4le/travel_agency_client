@@ -13,8 +13,20 @@
 }
 
 .menusWrapper {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+}
+
+.placeholder {
+    display: flex;
+    gap: 5px;
+}
+
+.stars {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 17px;
 }
 
 @media (max-width: 593px) {

@@ -1,17 +1,17 @@
 const textFields = [
     {
-        name: "title",
+        name: "tourTitle",
         placeholder: "Название",
         multiline: false,
         error: "Название тура обязательно"
     },
     {
-        name: "descr",
+        name: "tourDescr",
         placeholder: "Описание",
         multiline: true
     },
     {
-        name: "notes",
+        name: "tourNotes",
         placeholder: "Примечания",
         multiline: true
     }

@@ -65,11 +65,12 @@ const ToursList = ({ queryState }) => {
     });
 
     const renderListItems = () => tours.filter(tour => {
-        const { base_price, avg_mark, nutrition_types, room_types } = tour;
+        const { basePrice, avgMark, hotel } = tour;
+        const { nutritionTypes, roomTypes } = hotel;
 
-        return base_price >= priceRange[0] && base_price <= priceRange[1] && +avg_mark >= minRating
-                && nutrition_types.some(type => activeNutrTypes.includes(type))
-                && room_types.some(type => activeRoomTypes.includes(type))
+        return basePrice >= priceRange[0] && basePrice <= priceRange[1] && avgMark >= minRating
+                && nutritionTypes.some(type => activeNutrTypes.includes(type))
+                && roomTypes.some(type => activeRoomTypes.includes(type))
     }).map(tour => <ToursListItem key={tour.id} tour={tour}/>);
 
     switch (queryState) {
@@ -97,12 +98,8 @@ const ToursList = ({ queryState }) => {
                                 ".MuiSlider-thumb": {
                                     color: "#8DD3BB"
                                 },
-                                ".MuiSlider-track": {
+                                ".MuiSlider-track, .MuiSlider-rail": {
                                     color: "#112211",
-                                    height: 2
-                                },
-                                ".MuiSlider-rail": {
-                                    backgroundColor: "#112211",
                                     height: 2
                                 }
                             }}

@@ -2,21 +2,18 @@
 
 import styles from "./bookForm.module.css";
 import dayjs from "dayjs";
-import { helperStyle } from "../input/Input";
 import { BASE_URL } from "@/env";
 import { Controller } from "react-hook-form";
-import { FormHelperText } from "@mui/material";
 import Input from "../input/Input";
 import SelectMenu from "../selectMenu/SelectMenu";
-import SubmitBtn from "../submitBtn/SubmitBtn";
 import UserSpinner from "../loadingSpinners/UserSpinner";
+import SubmitWrapper from "../submitWrapper/SubmitWrapper";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Restaurant, KingBed } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useToken } from "../GlobalContext";
-import { v4 as uuid } from "uuid";
 import schema from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useQuery from "@/hooks/query.hook";
@@ -31,8 +28,8 @@ const maxStartDate = today.add(3, "month");
 const defaultEndDate = minStartDate.add(1, "week");
 
 const amounts = [
-    ["Кол-во взрослых", "adultsAmount", 1],
-    ["Кол-во детей", "childrenAmount", 0]
+    ["Кол-во взрослых", "adultsAmount"],
+    ["Кол-во детей", "childrenAmount"]
 ];
 
 const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handleClose }) => {
@@ -48,16 +45,37 @@ const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handl
         endDate: defaultEndDate
     });
 
-    const { control, handleSubmit, formState: { errors, isValid } } = useForm({
+    const { control, handleSubmit, formState: { errors, isValid }, watch, trigger } = useForm({
         resolver: yupResolver(schema),
         mode: "onChange",
         defaultValues: {
+            roomType: '',
+            nutrType: '',
             adultsAmount: 1,
             childrenAmount: 0
         }
     });
 
     const { query, queryState, resetQueryState } = useQuery();
+    const roomType = watch("roomType");
+    const nutrType = watch("nutrType");
+    const adultsAmount = watch("adultsAmount");
+
+    const setType = (type, arr, val) => {
+        setBooking(booking => ({ ...booking, [type]: arr.indexOf(val.split(' ')[0]) + 1 }));
+    }
+
+    useEffect(() => {
+        setType("nutrType", nutrTypes, nutrType);
+    }, [nutrType]);
+
+    useEffect(() => {
+        setType("roomType", rts, roomType);
+    }, [roomType]);
+
+    useEffect(() => {
+        trigger("adultsAmount");
+    }, [adultsAmount, roomType]);
 
     useEffect(() => {
         if (!isValid) return;
@@ -76,23 +94,23 @@ const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handl
         setBooking(booking => ({...booking, startDate, endDate: startDate.add(1, "week")}));
     }
 
-    const changeEndDate = (endDate) => setBooking(booking => ({...booking, endDate}));
+    const changeEndDate = (endDate) => {
+        setBooking(booking => ({...booking, endDate}));
+    }
 
     const onSubmit = (data) => {
         setCanClose(false);
 
         const body = {
-            id: uuid(),
             tourId: id,
             startDate: booking.startDate.toDate(),
             endDate: booking.endDate.toDate(),
-            bookingDate: new Date(),
             totalPrice,
             ...data
         };
 
         query(
-            `${BASE_URL}/booking/add`,
+            `${BASE_URL}/booking/create`,
             "POST",
             {'Content-type': 'application/json', 'authorization': `Bearer ${token}`},
             JSON.stringify(body)
@@ -105,16 +123,16 @@ const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handl
         .finally(() => setCanClose(true));
     }
 
-    const renderInputs = () => amounts.map(([text, name, defaultValue]) => (
+    const renderInputs = () => amounts.map(([text, name]) => (
         <Controller
             key={name}
             name={name}
             control={control}
             render={
-                ({ field: { onChange } }) =>
+                ({ field: { onChange, value } }) =>
                     <Input
                         placeholder={text}
-                        defaultValue={defaultValue}
+                        value={value}
                         error={errors[name]}
                         onChange={(e) => {
                             onChange(e);
@@ -154,11 +172,7 @@ const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handl
                     name="roomType"
                     control={control}
                     values={rts.map(item => `${item} - ${roomTypes.find(t => t.value === item).descr}`)}
-                    error={errors.roomType}
-                    disableScrollLock
-                    onChange={(e) => setBooking(booking => (
-                        {...booking, roomType: rts.indexOf(e.target.value.split(" - ")[0]) + 1}
-                    ))}>
+                    error={errors.roomType}>
                     <div style={{display: "flex", gap: "5px"}}>
                         <KingBed fontSize="small"/>
                         <p>Тип номера</p>
@@ -168,11 +182,7 @@ const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handl
                     name="nutrType"
                     control={control}
                     values={nutrTypes.map(item => `${item} - ${nutritionTypes.find(t => t.value === item).descr}`)}
-                    error={errors.nutrType}
-                    disableScrollLock
-                    onChange={(e) => setBooking(booking => (
-                        {...booking, nutrType: nutrTypes.indexOf(e.target.value.split(" - ")[0]) + 1}
-                    ))}>
+                    error={errors.nutrType}>
                     <div style={{display: "flex", gap: "5px"}}>
                         <Restaurant fontSize="small"/>
                         <p>Тип питания</p>
@@ -181,20 +191,16 @@ const BookForm = ({ id, roomTypes: rts, nutrTypes, basePrice, setCanClose, handl
                 {inputs}
             </LocalizationProvider>
             </div>
-            {isValid && 
+            {isValid &&
             <p className={styles.priceWrapper}>
                 Итоговая стоимость тура: <span className={styles.price}>${totalPrice}</span>
             </p>}
-            <div className={styles.submitWrapper}>
-                {queryState === "pending" ? <UserSpinner/> :
-                <SubmitBtn
-                    style={{width: "100%"}}
-                    disabled={queryState !== "idle"}>Забронировать</SubmitBtn>}
-                {queryState === "error" &&
-                <FormHelperText sx={helperStyle} error>{errorMsg}</FormHelperText>}
-                {queryState === "fulfilled" &&
-                <FormHelperText sx={{...helperStyle, color: "green"}}>Тур забронирован</FormHelperText>}
-            </div>
+            <SubmitWrapper
+                queryState={queryState}
+                spinner={<UserSpinner/>}
+                btnText="Забронировать"
+                errorMsg={errorMsg}
+                successText="Тур забронирован"/>
         </form>
     );
 }

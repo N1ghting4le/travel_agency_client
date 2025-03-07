@@ -9,6 +9,8 @@ const contacts = [
     [WhatsApp, "wa.me/7952812"]
 ];
 
+const icons = [Facebook, Twitter, YouTube, Instagram];
+
 const Footer = () => {
     return (
         <footer className={styles.footer}>
@@ -30,10 +32,7 @@ const Footer = () => {
                     </defs>
                 </svg>
                 <div className={styles.icons}>
-                    <Facebook className={styles.icon}/>
-                    <Twitter className={styles.icon}/>
-                    <YouTube className={styles.icon}/>
-                    <Instagram className={styles.icon}/>
+                    {icons.map((Icon, i) => <Icon key={i} className={styles.icon}/>)}
                 </div>
             </div>
             <div className={styles.cities}>
@@ -42,11 +41,12 @@ const Footer = () => {
             </div>
             <div className={styles.contactsWrapper}>
                 <p style={{fontWeight: 600}}>Контакты</p>
-                {contacts.map(([Icon, value]) => 
+                {contacts.map(([Icon, value]) => (
                     <div key={value} className={styles.contact}>
                         <Icon className={styles.icon}/>
                         <p>{value}</p>
-                    </div>)}
+                    </div>
+                ))}
             </div>
         </footer>
     );

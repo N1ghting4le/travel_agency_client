@@ -3,7 +3,7 @@ import SignUpForm from "@/components/signUpForm/SignUpForm";
 import Logo from "@/components/logo/Logo";
 import Image from "next/image";
 import Link from "next/link";
-import picture from "../../public/signup_image.jpg";
+import picture from "@/public/signup_image.jpg";
 
 export const metadata = {
     title: "Регистрация"

@@ -1,13 +1,13 @@
-import "./page.css";
+import "./not-found.css";
 import Link from "next/link";
 
 export const metadata = {
-    title: "Don't try it!"
+    title: "You got lost!"
 };
 
-const Forbidden = () => (
+const NotFound = () => (
     <div className="o-404">
-        <h1 className="a-title">403</h1>
+        <h1 className="a-title">404</h1>
         <p className="a-message">
             You came to the wrong neighborhood
         </p>
@@ -34,4 +34,4 @@ const Forbidden = () => (
     </div>
 );
 
-export default Forbidden;
+export default NotFound;

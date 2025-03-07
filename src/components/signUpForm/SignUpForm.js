@@ -1,29 +1,29 @@
 'use client';
 
 import styles from "./signUpForm.module.css";
-import { helperStyle } from "../input/Input";
 import { BASE_URL } from "@/env";
 import { Controller } from "react-hook-form";
-import { FormHelperText } from "@mui/material";
 import Input from "../input/Input";
 import PasswordInput from "../passwordInput/PasswordInput";
 import UserSpinner from "../loadingSpinners/UserSpinner";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useUser, useToken } from "../GlobalContext";
-import { v4 as uuid } from "uuid";
+import { useToken, useAdmin } from "../GlobalContext";
 import schema from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import useQuery from "@/hooks/query.hook";
-import SubmitBtn from "../submitBtn/SubmitBtn";
+import useAuth from "@/hooks/auth.hook";
+import SubmitWrapper from "../submitWrapper/SubmitWrapper";
 import fields from "./fields";
 
 const SignUpForm = () => {
-    const { setUser } = useUser();
-    const { setToken } = useToken();
+    const pathname = usePathname();
+    const { isAdmin } = useAdmin();
+    const { token } = useToken();
     const [error, setError] = useState("");
     const router = useRouter();
+    const authorize = useAuth();
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
@@ -32,21 +32,20 @@ const SignUpForm = () => {
     const { query, queryState, resetQueryState } = useQuery();
 
     const onSubmit = (data) => {
-        const { confirmPassword, ...rest } = data;
-        const body = { id: uuid(), ...rest };
+        const { confirmPassword, ...body } = data;
+        const headers = {'Content-type': 'application/json'};
 
-        query(`${BASE_URL}/auth/signUp`, "POST", {'Content-type': 'application/json'}, JSON.stringify(body))
+        if (isAdmin) headers.authorization = `Bearer ${token}`;
+
+        query(`${BASE_URL}/user/signUp`, "POST", headers, JSON.stringify(body))
             .then(res => {
-                const { password, ...user } = body;
-
-                setToken(res);
-                setUser(user);
-                router.back();
+                if (!isAdmin) {
+                    authorize(res);
+                    router.back();
+                }
             })
-            .catch(err => {
-                setError(err.message);
-                setTimeout(resetQueryState, 2000);
-            });
+            .catch(err => setError(err.message))
+            .finally(() => setTimeout(resetQueryState, 2000));
     }
 
     const renderFields = (arr, Input) => arr.map(({ name, placeholder }) => (
@@ -67,24 +66,20 @@ const SignUpForm = () => {
     const fieldsEls = renderFields(fields.slice(0, 4), Input);
     const passwordFields = renderFields(fields.slice(4), PasswordInput);
 
-    return (
+    return !pathname.includes("admin") || isAdmin ? (
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
             <div className={styles.fieldsWrapper}>
                 {fieldsEls}
             </div>
             {passwordFields}
-            <div className={styles.submitWrapper}>
-                {queryState === "pending" ? <UserSpinner/> :
-                <SubmitBtn 
-                    style={{width: "100%"}}
-                    disabled={queryState !== "idle"}>Регистрация</SubmitBtn>}
-                {queryState === "error" &&
-                <FormHelperText sx={helperStyle} error>{error || "Произошла ошибка"}</FormHelperText>}
-                {queryState === "fulfilled" &&
-                <FormHelperText sx={{...helperStyle, color: "green"}}>Регистрация прошла успешно</FormHelperText>}
-            </div>
+            <SubmitWrapper
+                queryState={queryState}
+                spinner={<UserSpinner/>}
+                btnText={isAdmin ? "Добавить сотрудника" : "Регистрация"}
+                errorMsg={error || "Произошла ошибка"}
+                successText={isAdmin ? "Сотрудник добавлен" : "Регистрация прошла успешно"}/>
         </form>
-    );
+    ) : null;
 }
 
 export default SignUpForm;

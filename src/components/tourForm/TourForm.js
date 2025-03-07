@@ -4,81 +4,82 @@ import styles from "./tourForm.module.css";
 import { helperStyle } from "../input/Input";
 import Input from "../input/Input";
 import SelectMenu from "../selectMenu/SelectMenu";
-import SubmitBtn from "../submitBtn/SubmitBtn";
 import AdminSpinner from "../loadingSpinners/AdminSpinner";
 import ResetHoc from "../ResetHoc";
+import SubmitWrapper from "../submitWrapper/SubmitWrapper";
 import { FormHelperText } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useAdmin, useToken, useTours } from "../GlobalContext";
-import { useRouter } from "next/navigation";
 import useQuery from "@/hooks/query.hook";
 import schema from "./schema";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { v4 as uuid } from "uuid";
 import textFields from "./textFields";
 import departureCities from "@/lists/departureCities";
 import countries from "@/lists/countries";
 import { BASE_URL } from "@/env";
 
-const TourForm = ResetHoc(({ tour, countryHotels, reset }) => {
+const TourForm = ResetHoc(({ tour, reset }) => {
     const { isAdmin } = useAdmin();
     const { token } = useToken();
     const { changeTour } = useTours();
-    const router = useRouter();
-    const [hotels, setHotels] = useState(tour ? countryHotels : []);
+    const [hotels, setHotels] = useState(tour ? [tour.hotelTitle] : []);
 
-    const { control, handleSubmit, formState: { errors, isDirty, defaultValues }, setValue, getValues, reset: formReset } = useForm({
+    const { control, handleSubmit, formState: { errors, isDirty, defaultValues }, reset: formReset, watch, setValue } = useForm({
         resolver: yupResolver(schema),
         mode: "onChange",
         defaultValues: {
-            title: tour?.title || "",
-            descr: tour?.descr || "",
-            notes: tour?.notes || "",
-            departureCity: tour?.departure_city || "",
-            destinationCountry: tour?.destination_country || "",
-            hotelTitle: tour?.hotel_title || "",
-            basePrice: tour?.base_price || ""
+            tourTitle: tour?.tourTitle || "",
+            tourDescr: tour?.tourDescr || "",
+            tourNotes: tour?.tourNotes || "",
+            departureCity: tour?.departureCity || "",
+            destinationCountry: tour?.destinationCountry || "",
+            hotelTitle: tour?.hotelTitle || "",
+            basePrice: tour?.basePrice || ""
         }
     });
 
     const { query: q1, queryState: qs1 } = useQuery();
     const { query: q2, queryState: qs2, resetQueryState } = useQuery();
+    const country = watch("destinationCountry");
 
     useEffect(() => {
-        if (!isAdmin) router.push("/403");
-    }, [isAdmin]);
+        if (tour) return;
+
+        setHotels([]);
+        setValue("hotelTitle", "");
+
+        if (country) {
+            q1(`${BASE_URL}/hotel/getHotels/${country}`)
+                .then(res => setHotels(res))
+                .catch(() => setHotels([]));
+        }
+    }, [country]);
 
     const onSubmit = (data) => {
         const { hotelTitle, ...rest } = data;
-        const id = tour?.id || uuid();
 
         const body = {
-            id,
-            hotelId: hotels.find(hotel => hotel.hotel_title === hotelTitle).id,
+            id: tour?.id || null,
+            hotelId: tour ? null : hotels.find(h => h.hotelTitle === hotelTitle).id,
             ...rest
-        }, headers = {'Content-type': 'application/json', 'authorization': `Bearer ${token}`};
+        }
 
-        q2(`${BASE_URL}/tour/${tour ? `edit/${id}` : "add"}`, tour ? "PATCH" : "POST", headers, JSON.stringify(body))
-            .then(res => {
-                if (tour) {
-                    changeTour(res);
-                    formReset(data);
-                } else setTimeout(reset, 2000);
-            })
-            .finally(() => setTimeout(resetQueryState, 2000));
-    }
-
-    const onCountryChange = (e) => {
-        const isSameCountry = e.target.value === defaultValues.destinationCountry;
-        const options = { shouldDirty: true, shouldValidate: isSameCountry };
-
-        setValue("hotelTitle", isSameCountry ? defaultValues.hotelTitle : "", options);
-        setValue("basePrice", isSameCountry ? defaultValues.basePrice : "", options);
-
-        q1(`${BASE_URL}/hotel/getHotels/${e.target.value}`)
-            .then(res => setHotels(res))
-            .catch(() => setHotels([]));
+        q2(
+            `${BASE_URL}/tour/${tour ? "update" : "create"}`,
+            tour ? "PATCH" : "POST",
+            {'Content-type': 'application/json', 'authorization': `Bearer ${token}`},
+            JSON.stringify(body)
+        )
+        .then(res => {
+            if (tour) {
+                changeTour(res);
+                formReset(data);
+            } else {
+                setTimeout(reset, 2000);
+            }
+        })
+        .finally(() => setTimeout(resetQueryState, 2000));
     }
 
     const renderTextFields = () => textFields.map(field => {
@@ -108,60 +109,56 @@ const TourForm = ResetHoc(({ tour, countryHotels, reset }) => {
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
             {textFieldsEls}
             <SelectMenu
-                defaultValue={tour?.departure_city}
                 values={departureCities}
                 name="departureCity"
                 control={control}
-                error={errors.departureCity}>Город вылета</SelectMenu>
+                error={errors.departureCity}
+                disabled={!!tour}
+                disableClearable>Город вылета</SelectMenu>
             <SelectMenu
-                defaultValue={tour?.destination_country}
                 values={countries}
                 name="destinationCountry"
                 control={control}
-                onChange={onCountryChange}
-                error={errors.destinationCountry}>Страна</SelectMenu>
+                error={errors.destinationCountry}
+                disabled={!!tour}
+                disableClearable>Страна</SelectMenu>
             {(() => {
                 switch (qs1) {
                     case "pending": return <AdminSpinner/>;
                     case "error":
-                        return <FormHelperText 
+                        return <FormHelperText
                                     sx={helperStyle}
                                     error>Не удалось загрузить отели</FormHelperText>;
                 }
             })()}
-            {hotels.length && qs1 !== "pending" && qs1 !== "error" ?
+            {qs1 === "fulfilled" || tour ?
             <>
             <SelectMenu
-                defaultValue={getValues("destinationCountry") === defaultValues.destinationCountry ? defaultValues.hotelTitle : ""}
-                values={hotels.map(hotel => hotel.hotel_title)}
+                values={hotels.map(hotel => hotel.hotelTitle)}
                 name="hotelTitle"
                 control={control}
-                error={errors.hotelTitle}>Отель</SelectMenu>
+                error={errors.hotelTitle}
+                disabled={!!tour}>Отель</SelectMenu>
             <Controller
                 name="basePrice"
                 control={control}
                 render={
                     ({ field: { onChange } }) =>
                         <Input
-                            defaultValue={getValues("destinationCountry") === defaultValues.destinationCountry ? defaultValues.basePrice : ""}
+                            defaultValue={defaultValues.basePrice}
                             placeholder="Начальная цена"
                             error={errors.basePrice}
                             onChange={onChange}
                             type="number"/>
                 }
             />
-            <div className={styles.submitWrapper}>
-                {qs2 === "pending" ? <AdminSpinner/> :
-                <SubmitBtn
-                    disabled={qs2 !== "idle" || (tour && !isDirty)}
-                    style={{width: "100%"}}>{tour ? "Сохранить изменения" : "Добавить"}</SubmitBtn>}
-                {qs2 === "error" &&
-                <FormHelperText sx={helperStyle} error>Произошла ошибка</FormHelperText>}
-                {qs2 === "fulfilled" &&
-                <FormHelperText sx={{...helperStyle, color: "green"}}>
-                    {tour ? "Изменения успешно сохранены" : "Тур успешно добавлен"}
-                </FormHelperText>}
-            </div>
+            <SubmitWrapper
+                queryState={qs2}
+                spinner={<AdminSpinner/>}
+                disabled={tour && !isDirty}
+                btnText={tour ? "Сохранить изменения" : "Добавить"}
+                errorMsg="Произошла ошибка"
+                successText={tour ? "Изменения успешно сохранены" : "Тур успешно добавлен"}/>
             </> : null}
         </form>
     ) : null;

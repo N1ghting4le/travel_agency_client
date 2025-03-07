@@ -16,13 +16,14 @@ const style = {
     p: 4
 };
 
-const ReviewModal = ({ open, setOpen, setReviews, review, tourId }) => {
+const ReviewModal = ({ open, setOpen, setReviews, review, setReview, tourId }) => {
     const [canClose, setCanClose] = useState(true);
     
     const handleClose = () => {
         if (!canClose) return;
 
         setOpen(false);
+        setReview(null);
         document.scrollingElement.style.overflow = "auto";
     }
 
