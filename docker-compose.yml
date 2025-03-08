@@ -1,0 +1,18 @@
+version: "3"
+services:
+  next-app:
+    container_name: next-js
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 3001:3001
+    environment:
+      BASE_URL: http://server:8080
+    networks:
+      - kursach-network
+
+networks:
+  kursach-network:
+    external: true

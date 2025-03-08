@@ -1,5 +1,4 @@
 import styles from "./page.module.css";
-import { BASE_URL } from "@/env";
 import DisplayStars from "@/components/displayStars/DisplayStars";
 import { Divider } from "@mui/material";
 import TourReviews from "@/components/tourReviews/TourReviews";
@@ -12,7 +11,7 @@ import PinDropIcon from '@mui/icons-material/PinDrop';
 import { getData } from "@/app/(adminOrEmployee)/admin/edit-tour/[id]/page";
 
 const TourPage = async ({ params }) => {
-    const tour = await getData(`${BASE_URL}/tour/get/${params.id}`);
+    const tour = await getData(`${process.env.BASE_URL}/tour/get/${params.id}`);
     const {
         departureCity, destinationCountry, tourTitle,
         id, tourDescr, tourNotes, hotel, basePrice,

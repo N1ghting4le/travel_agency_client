@@ -1,5 +1,4 @@
 import styles from "./page.module.css";
-import { BASE_URL } from "@/env";
 import UserInfo from "@/components/userInfo/UserInfo";
 import BookingsList from "@/components/bookingsList/BookingsList";
 import { getData } from "@/app/(adminOrEmployee)/admin/edit-tour/[id]/page";
@@ -10,7 +9,7 @@ export const metadata = {
 
 const UserPage = async ({ params }) => {
     const { id } = params;
-    const bookings = await getData(`${BASE_URL}/booking/get/${id}`);
+    const bookings = await getData(`${process.env.BASE_URL}/booking/get/${id}`);
 
     return (
         <main className={styles.main}>
