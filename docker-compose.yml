@@ -1,6 +1,7 @@
 version: "3"
 services:
   next-app:
+    image: n1ghting4le/kursach-client:latest
     container_name: next-js
     build:
       context: .
