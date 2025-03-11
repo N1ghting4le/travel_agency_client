@@ -1,8 +1,12 @@
 import { object, string, ref } from "yup";
-import { signInObj } from "../signInForm/schema";
 
 const schema = object().shape({
-    ...signInObj,
+    email: string().trim().required("Адрес эл. почты обязателен").email("Некорректный адрес эл. почты"),
+    password: string()
+                .trim()
+                .required("Пароль обязателен")
+                .min(8, "Минимальная длиина пароля - 8 символов")
+                .max(20, "Максимальная длина пароля - 20 символов"),
     name: string().trim().required("Имя обязательно"),
     surname: string().trim().required("Фамилия обязательна"),
     phoneNumber: string()

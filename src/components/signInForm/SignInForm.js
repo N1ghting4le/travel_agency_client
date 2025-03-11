@@ -27,6 +27,7 @@ const SignInForm = () => {
     const { query, queryState, resetQueryState } = useQuery();
 
     const onSubmit = (data) => {
+        setError("");
         query(`${BASE_URL}/user/signIn`, "POST", {'Content-type': 'application/json'}, JSON.stringify(data))
             .then(res => {
                 authorize(res);
@@ -41,13 +42,13 @@ const SignInForm = () => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
             <Controller
-                name="email"
+                name="phoneOrEmail"
                 control={control}
                 render={
                     ({ field: { onChange } }) =>
                         <Input 
-                            placeholder="Адрес эл. почты"
-                            error={errors.email}
+                            placeholder="Адрес эл. почты или моб. тел."
+                            error={errors.phoneOrEmail}
                             onChange={onChange}/>
                 }
             />
