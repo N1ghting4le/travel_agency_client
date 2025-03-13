@@ -1,0 +1,48 @@
+name: Build Next.js client for course project
+on: push
+jobs:
+  build-client:
+    name: Build client
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout node
+      uses: actions/checkout@v3
+    - name: Install NPM dependencies
+      run: npm install
+    - name: Build client assets
+      run: npm run build
+    - name: Upload static site content
+      uses: actions/upload-artifact@v3
+      with:
+        name: static-site
+        path: .next/
+  release-client:
+    name: Release client
+    needs: build-client
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: static-site
+    - name: Archive site content
+      uses: thedoctor0/zip-release@main
+      with:
+        name: site.zip
+    - name: Create GitHub Release
+      id: create-new-release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create-new-release.outputs.upload_url }}
+        aseet_path: ./site.zip
+        asset_name: site-v${{ github.run_number }}.zip
+        asset_content_type: application/zip
