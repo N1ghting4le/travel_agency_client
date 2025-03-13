@@ -12,7 +12,7 @@ jobs:
     - name: Build client assets
       run: npm run build
     - name: Upload static site content
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: static-site
         path: .next/
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: static-site
     - name: Archive site content
