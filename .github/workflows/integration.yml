@@ -13,11 +13,11 @@ jobs:
       run: npm run build
     - name: Prepare files for archiving
       run: |
-        mkdir -p dist
+        mkdir dist
         cp -r .next/standalone/* dist/
-        mkdir -p dist/.next/static
+        mkdir dist/.next/static
         cp -r .next/static/* dist/.next/static/
-        mkdir -p dist/public
+        mkdir dist/public
         cp -r src/public/* dist/public/
         zip -r site.zip dist
     - name: Upload archive
