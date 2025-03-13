@@ -14,11 +14,7 @@ jobs:
     - name: Prepare files for archiving
       run: |
         mkdir dist
-        cp -r .next/standalone/* dist/
-        mkdir dist/.next/static
-        cp -r .next/static/* dist/.next/static/
-        mkdir dist/public
-        cp -r src/public/* dist/public/
+        cp -r .next/* dist/
         zip -r site.zip dist
     - name: Upload archive
       uses: actions/upload-artifact@v4
